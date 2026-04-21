@@ -47,3 +47,7 @@ internal object NativeBridge {
     @JvmStatic external fun apmProcessReverseStream(handle: Long, pcm: ShortArray, frameSize: Int): Int
     @JvmStatic external fun apmDestroy(handle: Long)
 }
+
+/** Returns true if the Opus native codec is available on this device. */
+fun isOpusAvailable(): Boolean = NativeBridge.hasOpus
+

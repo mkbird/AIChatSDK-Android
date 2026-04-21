@@ -34,7 +34,7 @@ class SpeechManager {
     private val _ttsPlaybackDoneCount = MutableStateFlow(0)
     val ttsPlaybackDoneCount: StateFlow<Int> = _ttsPlaybackDoneCount
 
-    private var transport: ChatEventTransport? = null
+    @Volatile private var transport: ChatEventTransport? = null
     private var engine: FullDuplexAudioEngine? = null
     private val started = AtomicBoolean(false)
 

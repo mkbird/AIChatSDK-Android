@@ -6,6 +6,8 @@ import com.aichatsdk.demo.providers.DemoChatContext
 import com.aichatsdk.demo.providers.DemoTokenProvider
 import com.aichatsdk.demo.settings.DemoSettings
 import com.aichatsdk.demo.transport.DemoEventTransport
+import com.aichatsdk.audio.isOpusAvailable
+import com.aichatsdk.models.CodecType
 import com.aichatsdk.models.SpeechConfig
 import com.aichatsdk.persistence.DataStoreChatStore
 import com.aichatsdk.protocols.ChatEventTransport
@@ -35,6 +37,12 @@ class DemoApp : Application() {
             )
         )
         connect()
+    }
+
+    /** Returns the configured codec, falling back to PCM if Opus native lib is unavailable. */
+    fun effectiveCodec(): CodecType {
+        val desired = settings.snapshot().codec
+        return if (desired == CodecType.Opus && !isOpusAvailable()) CodecType.Pcm else desired
     }
 
     fun connect() {

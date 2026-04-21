@@ -114,8 +114,11 @@ Java_com_aichatsdk_audio_NativeBridge_opusDecode(
     jsize len = env->GetArrayLength(opus);
     std::vector<uint8_t> in(len);
     env->GetByteArrayRegion(opus, 0, len, reinterpret_cast<jbyte*>(in.data()));
-    std::vector<int16_t> out(frameSize);
-    int n = opus_decode(dec, in.data(), len, out.data(), frameSize, 0);
+    // Use max Opus frame size (120ms) so any packet duration is accepted.
+    // opus_decode returns the actual number of decoded samples.
+    const int maxSamples = frameSize * 6; // 20ms * 6 = 120ms
+    std::vector<int16_t> out(maxSamples);
+    int n = opus_decode(dec, in.data(), len, out.data(), maxSamples, 0);
     if (n <= 0) {
         LOGE("opus_decode failed: %d", n);
         return nullptr;

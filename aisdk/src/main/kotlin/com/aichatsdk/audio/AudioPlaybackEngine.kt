@@ -110,6 +110,7 @@ class AudioPlaybackEngine(
     private fun decodeIfNeeded(frame: ByteArray): ShortArray? {
         val dec = decoder
         return if (dec != null) {
+            Log.d(TAG, "opus decode: frameBytes=${frame.size} first=${frame.take(3).joinToString { "%02x".format(it) }}")
             dec.decode(frame)
         } else {
             // raw PCM little-endian → shorts

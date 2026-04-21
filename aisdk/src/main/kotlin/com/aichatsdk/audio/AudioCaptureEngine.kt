@@ -42,7 +42,7 @@ class AudioCaptureEngine(
         ).coerceAtLeast(frame20 * 4)
 
         val rec = AudioRecord(
-            MediaRecorder.AudioSource.VOICE_RECOGNITION,
+            MediaRecorder.AudioSource.MIC,
             sampleRate,
             AudioFormat.CHANNEL_IN_MONO,
             AudioFormat.ENCODING_PCM_16BIT,
@@ -55,6 +55,9 @@ class AudioCaptureEngine(
         record = rec
         if (codec == CodecType.Opus && NativeBridge.hasOpus) {
             encoder = OpusEncoder(sampleRate)
+            Log.i(TAG, "Opus encoder created, sampleRate=$sampleRate")
+        } else {
+            Log.w(TAG, "Opus not available (hasOpus=${NativeBridge.hasOpus}), using PCM")
         }
         rec.startRecording()
         running.set(true)
@@ -88,6 +91,8 @@ class AudioCaptureEngine(
     private fun emit(pcm20ms: ShortArray) {
         val maxAmp = pcm20ms.maxOf { it.toInt().let { v -> if (v < 0) -v else v } }
         if (maxAmp < 10) Log.w(TAG, "capture: near-silent frame maxAmp=$maxAmp")
+        // Software gain when APM AGC2 is not available (APM handles it otherwise)
+        if (apm == null) applyGain(pcm20ms, gain = 4.0f)
         val enc = encoder
         if (enc != null) {
             enc.encode(pcm20ms)?.let(onFrame)
@@ -99,6 +104,12 @@ class AudioCaptureEngine(
                 out[i * 2 + 1] = ((s shr 8) and 0xFF).toByte()
             }
             onFrame(out)
+        }
+    }
+
+    private fun applyGain(pcm: ShortArray, gain: Float) {
+        for (i in pcm.indices) {
+            pcm[i] = (pcm[i] * gain).toInt().coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt()).toShort()
         }
     }
 

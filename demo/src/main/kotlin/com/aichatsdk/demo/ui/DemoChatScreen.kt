@@ -111,8 +111,8 @@ fun DemoChatScreen(app: DemoApp) {
                         onPttDown = {
                             val cfg = SpeechConfig(
                                 mode = m.mode ?: SpeechMode.AsrOnly,
-                                inputCodec = app.settings.snapshot().codec,
-                                outputCodec = app.settings.snapshot().codec,
+                                inputCodec = app.effectiveCodec(),
+                                outputCodec = app.effectiveCodec(),
                                 ttsEnabled = m.tts,
                             )
                             service.startSpeech(cfg)
