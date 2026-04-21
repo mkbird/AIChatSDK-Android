@@ -1,0 +1,2 @@
+ninja: Entering directory `/Users/madongpeng/work/AIChatSDK-Android/aisdk/.cxx/Debug/2c5w2m51/arm64-v8a'
+ninja: no work to do.

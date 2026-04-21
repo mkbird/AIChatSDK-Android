@@ -1,0 +1,6 @@
+[submodule "aisdk/src/main/cpp/third_party/opus"]
+	path = aisdk/src/main/cpp/third_party/opus
+	url = https://github.com/xiph/opus.git
+[submodule "aisdk/src/main/cpp/third_party/webrtc-apm"]
+	path = aisdk/src/main/cpp/third_party/webrtc-apm
+	url = https://gitlab.freedesktop.org/pulseaudio/webrtc-audio-processing.git

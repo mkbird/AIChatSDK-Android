@@ -1,0 +1,19 @@
+/Users/madongpeng/Library/Android/sdk/cmake/3.22.1/bin/cmake \
+  -H/Users/madongpeng/work/AIChatSDK-Android/aisdk/src/main/cpp \
+  -DCMAKE_SYSTEM_NAME=Android \
+  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+  -DCMAKE_SYSTEM_VERSION=24 \
+  -DANDROID_PLATFORM=android-24 \
+  -DANDROID_ABI=arm64-v8a \
+  -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a \
+  -DANDROID_NDK=/Users/madongpeng/Library/Android/sdk/ndk/26.1.10909125 \
+  -DCMAKE_ANDROID_NDK=/Users/madongpeng/Library/Android/sdk/ndk/26.1.10909125 \
+  -DCMAKE_TOOLCHAIN_FILE=/Users/madongpeng/Library/Android/sdk/ndk/26.1.10909125/build/cmake/android.toolchain.cmake \
+  -DCMAKE_MAKE_PROGRAM=/Users/madongpeng/Library/Android/sdk/cmake/3.22.1/bin/ninja \
+  "-DCMAKE_CXX_FLAGS=-std=c++17 -fvisibility=hidden -O2" \
+  -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=/Users/madongpeng/work/AIChatSDK-Android/aisdk/build/intermediates/cxx/Debug/2c5w2m51/obj/arm64-v8a \
+  -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=/Users/madongpeng/work/AIChatSDK-Android/aisdk/build/intermediates/cxx/Debug/2c5w2m51/obj/arm64-v8a \
+  -DCMAKE_BUILD_TYPE=Debug \
+  -B/Users/madongpeng/work/AIChatSDK-Android/aisdk/.cxx/Debug/2c5w2m51/arm64-v8a \
+  -GNinja \
+  -DANDROID_STL=c++_static

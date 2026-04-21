@@ -1,0 +1,10 @@
+/Users/madongpeng/work/AIChatSDK-Android/aisdk/src/main/cpp/CMakeLists.txt
+/Users/madongpeng/work/AIChatSDK-Android/aisdk/src/main/cpp/third_party/opus/CMakeLists.txt
+/Users/madongpeng/work/AIChatSDK-Android/aisdk/src/main/cpp/third_party/opus/cmake/CFeatureCheck.cmake
+/Users/madongpeng/work/AIChatSDK-Android/aisdk/src/main/cpp/third_party/opus/cmake/OpusBuildtype.cmake
+/Users/madongpeng/work/AIChatSDK-Android/aisdk/src/main/cpp/third_party/opus/cmake/OpusConfig.cmake
+/Users/madongpeng/work/AIChatSDK-Android/aisdk/src/main/cpp/third_party/opus/cmake/OpusConfig.cmake.in
+/Users/madongpeng/work/AIChatSDK-Android/aisdk/src/main/cpp/third_party/opus/cmake/OpusFunctions.cmake
+/Users/madongpeng/work/AIChatSDK-Android/aisdk/src/main/cpp/third_party/opus/cmake/OpusPackageVersion.cmake
+/Users/madongpeng/work/AIChatSDK-Android/aisdk/src/main/cpp/third_party/opus/cmake/OpusSources.cmake
+/Users/madongpeng/work/AIChatSDK-Android/aisdk/src/main/cpp/third_party/opus/cmake/config.h.cmake.in
