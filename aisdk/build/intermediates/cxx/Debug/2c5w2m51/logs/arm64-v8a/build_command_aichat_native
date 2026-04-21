@@ -1,4 +1,0 @@
-/Users/madongpeng/Library/Android/sdk/cmake/3.22.1/bin/ninja \
-  -C \
-  /Users/madongpeng/work/AIChatSDK-Android/aisdk/.cxx/Debug/2c5w2m51/arm64-v8a \
-  aichat_native
