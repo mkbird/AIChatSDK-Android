@@ -1,5 +1,6 @@
 package com.aichatsdk.services
 
+import android.util.Log
 import com.aichatsdk.audio.FullDuplexAudioEngine
 import com.aichatsdk.models.AnyValue
 import com.aichatsdk.models.ChatEvent
@@ -61,7 +62,10 @@ class SpeechManager {
             muteIncomingAudio = true
         }
 
-        val eng = (engine ?: FullDuplexAudioEngine.forConfig(config).also { engine = it })
+        // Always rebuild engine per session so codec/sampleRate changes take effect
+        // and stale state from prior sessions (e.g. PureAsr) doesn't carry over.
+        engine?.stopAll()
+        val eng = FullDuplexAudioEngine.forConfig(config).also { engine = it }
         eng.ensurePlayback()
         eng.setOnPlaybackDrained { _ttsPlaybackDoneCount.value = _ttsPlaybackDoneCount.value + 1 }
 
@@ -84,6 +88,10 @@ class SpeechManager {
             "input_codec" to AnyValue.Str(actualInputCodec.wire),
             "output_codec" to AnyValue.Str(config.outputCodec.wire),
             "tts" to AnyValue.Bool(config.ttsEnabled),
+        )
+        Log.d(
+            TAG,
+            "speech.start mode=${config.mode} input=$actualInputCodec output=${config.outputCodec} tts=${config.ttsEnabled}",
         )
         transport?.sendEvent(ChatEvent.text(EventType.SPEECH_START, id = "speech_${System.currentTimeMillis()}", payload = payload))
         _isSpeechActive.value = true
@@ -167,5 +175,9 @@ class SpeechManager {
         started.set(false)
         _isSpeechActive.value = false
         onPlaybackStop?.invoke()
+    }
+
+    companion object {
+        private const val TAG = "SpeechManager"
     }
 }

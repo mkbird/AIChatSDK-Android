@@ -30,6 +30,8 @@ fun VoiceInputBar(
     onToggleCall: () -> Unit,
 ) {
     var pressed by remember { mutableStateOf(false) }
+    val currentOnPttDown by rememberUpdatedState(onPttDown)
+    val currentOnPttUp by rememberUpdatedState(onPttUp)
     Row(
         Modifier
             .fillMaxWidth()
@@ -48,10 +50,10 @@ fun VoiceInputBar(
                     detectTapGestures(
                         onPress = {
                             pressed = true
-                            onPttDown()
+                            currentOnPttDown()
                             val released = tryAwaitRelease()
                             pressed = false
-                            onPttUp(!released)
+                            currentOnPttUp(!released)
                         }
                     )
                 },

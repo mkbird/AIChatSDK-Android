@@ -30,7 +30,7 @@ class AudioPlaybackEngine(
     private val running = AtomicBoolean(false)
     private val endOfStream = AtomicBoolean(false)
     private val pending = AtomicInteger(0)
-    private val queue = LinkedBlockingQueue<ByteArray?>()
+    private val queue = LinkedBlockingQueue<PlaybackItem>()
     private var track: AudioTrack? = null
     private var decoder: OpusDecoder? = null
     private var thread: Thread? = null
@@ -74,8 +74,9 @@ class AudioPlaybackEngine(
         val far10ms = ShortArray(pcm10msSamples)
         try {
             while (running.get()) {
-                val frame = queue.take() ?: break
-                val pcm = decodeIfNeeded(frame)
+                val item = queue.take()
+                if (item is PlaybackItem.Stop) break
+                val pcm = decodeIfNeeded((item as PlaybackItem.Frame).data)
                 if (pcm == null) {
                     pending.decrementAndGet()
                     maybeDrained()
@@ -127,7 +128,7 @@ class AudioPlaybackEngine(
     fun feedAudio(data: ByteArray) {
         if (!running.get()) return
         pending.incrementAndGet()
-        queue.offer(data)
+        queue.offer(PlaybackItem.Frame(data))
     }
 
     fun markEndOfStream() {
@@ -160,7 +161,7 @@ class AudioPlaybackEngine(
 
     fun stop() {
         if (!running.compareAndSet(true, false)) return
-        queue.offer(null) // unblock take()
+        queue.offer(PlaybackItem.Stop) // unblock take()
         try { thread?.join(300) } catch (_: InterruptedException) {}
         thread = null
         track?.runCatching { stop(); release() }
@@ -168,6 +169,11 @@ class AudioPlaybackEngine(
         decoder?.close(); decoder = null
         queue.clear()
         pending.set(0)
+    }
+
+    private sealed class PlaybackItem {
+        data class Frame(val data: ByteArray) : PlaybackItem()
+        data object Stop : PlaybackItem()
     }
 
     companion object { private const val TAG = "AudioPlayback" }
