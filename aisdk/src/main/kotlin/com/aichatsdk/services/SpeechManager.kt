@@ -72,10 +72,11 @@ class SpeechManager {
             }
         }
 
-        // Tell server
+        // Tell server — declare the codec that AudioCaptureEngine actually emits.
+        val actualInputCodec = eng.effectiveCaptureCodec ?: config.inputCodec
         val payload = mapOf(
             "mode" to AnyValue.Str(config.mode.wire),
-            "input_codec" to AnyValue.Str(config.inputCodec.wire),
+            "input_codec" to AnyValue.Str(actualInputCodec.wire),
             "output_codec" to AnyValue.Str(config.outputCodec.wire),
             "tts" to AnyValue.Bool(config.ttsEnabled),
         )

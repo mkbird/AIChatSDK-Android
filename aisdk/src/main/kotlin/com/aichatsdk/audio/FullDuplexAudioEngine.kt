@@ -34,6 +34,8 @@ class FullDuplexAudioEngine(
     private var capture: AudioCaptureEngine? = null
     private var playback: AudioPlaybackEngine? = null
 
+    val effectiveCaptureCodec: CodecType? get() = capture?.effectiveCodec
+
     private var onCaptureFrame: ((ByteArray) -> Unit)? = null
     private var onDrained: (() -> Unit)? = null
 

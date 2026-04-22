@@ -127,8 +127,8 @@ fun DemoChatScreen(app: DemoApp) {
                             } else {
                                 service.startSpeech(SpeechConfig(
                                     mode = SpeechMode.FullDuplex,
-                                    inputCodec = app.settings.snapshot().codec,
-                                    outputCodec = app.settings.snapshot().codec,
+                                    inputCodec = app.effectiveCodec(),
+                                    outputCodec = app.effectiveCodec(),
                                 ))
                                 inCall = true
                             }

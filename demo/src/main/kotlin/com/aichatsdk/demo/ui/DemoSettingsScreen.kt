@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.aichatsdk.demo.DemoApp
 import com.aichatsdk.models.CodecType
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -18,6 +19,8 @@ fun DemoSettingsScreen(app: DemoApp, onClose: (reconnect: Boolean) -> Unit) {
     var token by remember(s.token) { mutableStateOf(s.token) }
     var family by remember(s.familyId) { mutableStateOf(s.familyId) }
     var codec by remember(s.codec) { mutableStateOf(s.codec) }
+    val scope = rememberCoroutineScope()
+    val opusOk = app.opusAvailable
 
     Dialog(onDismissRequest = { onClose(false) }) {
         Surface(modifier = Modifier.fillMaxWidth().padding(16.dp), tonalElevation = 4.dp) {
@@ -30,8 +33,16 @@ fun DemoSettingsScreen(app: DemoApp, onClose: (reconnect: Boolean) -> Unit) {
                     Text("Codec")
                     Spacer(Modifier.width(12.dp))
                     AssistChip(
+                        enabled = opusOk,
                         onClick = { codec = if (codec == CodecType.Pcm) CodecType.Opus else CodecType.Pcm },
                         label = { Text(codec.wire.uppercase()) }
+                    )
+                }
+                if (!opusOk) {
+                    Text(
+                        "Opus 原生库不可用，使用 PCM",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
                     )
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -39,7 +50,10 @@ fun DemoSettingsScreen(app: DemoApp, onClose: (reconnect: Boolean) -> Unit) {
                         app.settings.reset(); onClose(true)
                     }) { Text("恢复默认") }
                     Button(onClick = {
-                        app.settings.update(server, token, family, codec); onClose(true)
+                        scope.launch {
+                            app.settings.update(server, token, family, codec)
+                            onClose(true)
+                        }
                     }) { Text("保存") }
                 }
                 Text("SDK 1.0.0 · Protocol v4", style = MaterialTheme.typography.bodySmall)

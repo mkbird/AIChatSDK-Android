@@ -28,6 +28,9 @@ class AudioCaptureEngine(
     private var encoder: OpusEncoder? = null
     private var thread: Thread? = null
 
+    private var _effectiveCodec: CodecType = CodecType.Pcm
+    val effectiveCodec: CodecType get() = _effectiveCodec
+
     /** APM session id (for system AudioEffect chaining if APM not used). */
     val audioSessionId: Int? get() = record?.audioSessionId
 
@@ -55,9 +58,11 @@ class AudioCaptureEngine(
         record = rec
         if (codec == CodecType.Opus && NativeBridge.hasOpus) {
             encoder = OpusEncoder(sampleRate)
+            _effectiveCodec = CodecType.Opus
             Log.i(TAG, "Opus encoder created, sampleRate=$sampleRate")
         } else {
-            Log.w(TAG, "Opus not available (hasOpus=${NativeBridge.hasOpus}), using PCM")
+            _effectiveCodec = CodecType.Pcm
+            Log.w(TAG, "Opus requested=${codec == CodecType.Opus}, hasOpus=${NativeBridge.hasOpus}, falling back to PCM")
         }
         rec.startRecording()
         running.set(true)

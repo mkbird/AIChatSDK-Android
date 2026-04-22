@@ -41,25 +41,27 @@ class DemoSettings(private val context: Context) {
     suspend fun reload() {
         val p = context.settingsStore.data.first()
         _state.value = DemoSettingsSnapshot(
-            serverURL = p[KEY_SERVER] ?: DEFAULT_SERVER,
+            serverURL = p[KEY_SERVER]?.takeUnless { it.isBlank() } ?: DEFAULT_SERVER,
             token = p[KEY_TOKEN] ?: DEFAULT_TOKEN,
             familyId = p[KEY_FAMILY] ?: DEFAULT_FAMILY,
-            codec = CodecType.fromWire(p[KEY_CODEC] ?: CodecType.Opus.wire),
+            codec = CodecType.fromWire(p[KEY_CODEC]),
         )
     }
 
     fun snapshot(): DemoSettingsSnapshot = _state.value
 
-    fun update(serverURL: String? = null, token: String? = null, familyId: String? = null, codec: CodecType? = null) {
-        scope.launch {
-            context.settingsStore.edit {
-                serverURL?.let { v -> it[KEY_SERVER] = v }
-                token?.let { v -> it[KEY_TOKEN] = v }
-                familyId?.let { v -> it[KEY_FAMILY] = v }
-                codec?.let { v -> it[KEY_CODEC] = v.wire }
-            }
-            reload()
+    suspend fun update(serverURL: String? = null, token: String? = null, familyId: String? = null, codec: CodecType? = null) {
+        val safeCodec = codec?.let {
+            val opusOk = runCatching { com.aichatsdk.demo.DemoApp.instance.opusAvailable }.getOrDefault(true)
+            if (it == CodecType.Opus && !opusOk) CodecType.Pcm else it
         }
+        context.settingsStore.edit {
+            serverURL?.takeIf { v -> v.isNotBlank() }?.let { v -> it[KEY_SERVER] = v }
+            token?.let { v -> it[KEY_TOKEN] = v }
+            familyId?.let { v -> it[KEY_FAMILY] = v }
+            safeCodec?.let { v -> it[KEY_CODEC] = v.wire }
+        }
+        reload()
     }
 
     fun reset() {

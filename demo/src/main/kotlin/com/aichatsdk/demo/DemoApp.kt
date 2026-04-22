@@ -12,6 +12,10 @@ import com.aichatsdk.models.SpeechConfig
 import com.aichatsdk.persistence.DataStoreChatStore
 import com.aichatsdk.protocols.ChatEventTransport
 import com.aichatsdk.services.ChatService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 class DemoApp : Application() {
 
@@ -20,12 +24,18 @@ class DemoApp : Application() {
     lateinit var chatService: ChatService
         private set
 
+    val opusAvailable: Boolean by lazy { isOpusAvailable() }
+
     private var transport: DemoEventTransport? = null
+    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onCreate() {
         super.onCreate()
         instance = this
         settings = DemoSettings(this)
+        if (!opusAvailable) {
+            appScope.launch { settings.update(codec = CodecType.Pcm) }
+        }
         chatService = ChatService(
             AIChatConfig(
                 serverBaseURL = settings.snapshot().serverURL,
@@ -42,7 +52,7 @@ class DemoApp : Application() {
     /** Returns the configured codec, falling back to PCM if Opus native lib is unavailable. */
     fun effectiveCodec(): CodecType {
         val desired = settings.snapshot().codec
-        return if (desired == CodecType.Opus && !isOpusAvailable()) CodecType.Pcm else desired
+        return if (desired == CodecType.Opus && !opusAvailable) CodecType.Pcm else desired
     }
 
     fun connect() {

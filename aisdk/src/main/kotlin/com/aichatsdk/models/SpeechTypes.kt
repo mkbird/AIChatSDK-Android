@@ -16,8 +16,14 @@ enum class CodecType(val wire: String) {
     Opus("opus");
 
     companion object {
-        fun fromWire(s: String): CodecType =
-            values().firstOrNull { it.wire == s } ?: Pcm
+        /**
+         * Default is Opus — unknown/blank values should favour the higher-quality
+         * codec. AudioCaptureEngine will transparently fall back to PCM at runtime
+         * if the native Opus encoder is unavailable.
+         */
+        fun fromWire(s: String?): CodecType =
+            if (s.isNullOrBlank()) Opus
+            else values().firstOrNull { it.wire == s } ?: Opus
     }
 }
 
