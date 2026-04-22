@@ -11,6 +11,7 @@ import com.aichatsdk.models.CodecType
 import com.aichatsdk.models.SpeechConfig
 import com.aichatsdk.persistence.DataStoreChatStore
 import com.aichatsdk.protocols.ChatEventTransport
+import com.aichatsdk.demo.audio.AudioRouter
 import com.aichatsdk.services.ChatService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +26,7 @@ class DemoApp : Application() {
         private set
 
     val opusAvailable: Boolean by lazy { isOpusAvailable() }
+    private lateinit var audioRouter: AudioRouter
 
     private var transport: DemoEventTransport? = null
     private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -32,6 +34,7 @@ class DemoApp : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+        audioRouter = AudioRouter(this)
         settings = DemoSettings(this)
         if (!opusAvailable) {
             appScope.launch { settings.update(codec = CodecType.Pcm) }
@@ -46,6 +49,8 @@ class DemoApp : Application() {
                 defaultSpeechConfig = SpeechConfig(),
             )
         )
+        chatService.speech.onPlaybackStart = { audioRouter.onPlaybackStart() }
+        chatService.speech.onPlaybackStop = { audioRouter.onPlaybackStop() }
         connect()
     }
 

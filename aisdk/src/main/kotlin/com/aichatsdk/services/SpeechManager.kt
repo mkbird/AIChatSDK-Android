@@ -38,6 +38,11 @@ class SpeechManager {
     private var engine: FullDuplexAudioEngine? = null
     private val started = AtomicBoolean(false)
 
+    /** Fired when audio playback starts (TTS begins or speech session with TTS). */
+    var onPlaybackStart: (() -> Unit)? = null
+    /** Fired when audio playback stops (TTS done, cancelled, or session torn down). */
+    var onPlaybackStop: (() -> Unit)? = null
+
     /** Buffer mic frames captured before the server ACKs SPEECH_STARTED. */
     private val preBuffer = ConcurrentLinkedQueue<ByteArray>()
     private val ackReceived = AtomicBoolean(false)
@@ -142,13 +147,16 @@ class SpeechManager {
             EventType.TTS_START -> {
                 isTtsPlaying = true
                 muteIncomingAudio = false
+                onPlaybackStart?.invoke()
             }
             EventType.TTS_DONE -> {
                 isTtsPlaying = false
                 engine?.markEndOfStream()
+                onPlaybackStop?.invoke()
             }
             EventType.TURN_CANCELLED -> {
                 engine?.clearPlayback()
+                onPlaybackStop?.invoke()
             }
         }
     }
@@ -158,5 +166,6 @@ class SpeechManager {
         engine = null
         started.set(false)
         _isSpeechActive.value = false
+        onPlaybackStop?.invoke()
     }
 }
